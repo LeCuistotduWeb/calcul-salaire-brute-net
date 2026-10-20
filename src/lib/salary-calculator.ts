@@ -14,11 +14,44 @@ export interface ContributionLine {
 export interface SalaryResult {
   brut: number
   net: number
+  netImposable: number
   totalSalarial: number
   lignes: ContributionLine[]
+  pas: number
+  tauxPas: number
+  netApresPas: number
 }
 
-function computeMonthly(brut: number, statut: Statut): SalaryResult {
+// Barème IR 2025 (revenus 2024)
+const BAREME_IR = [
+  { max: 11_497, taux: 0 },
+  { max: 29_315, taux: 0.11 },
+  { max: 83_823, taux: 0.30 },
+  { max: 180_294, taux: 0.41 },
+  { max: Infinity, taux: 0.45 },
+] as const
+
+function computeIR(revenuImposable: number, parts: number): number {
+  const qi = revenuImposable / parts
+  let ir = 0
+  let prev = 0
+  for (const { max, taux } of BAREME_IR) {
+    if (qi <= prev) break
+    ir += (Math.min(qi, max) - prev) * taux
+    prev = max
+  }
+  ir *= parts
+  if (ir <= 0) return 0
+
+  // Décote 2025
+  const couple = parts >= 2
+  const seuil = couple ? 3_166 : 1_939
+  const decoteMax = couple ? 1_444 : 873
+  if (ir < seuil) ir = Math.max(0, ir - Math.max(0, decoteMax - 0.4521 * ir))
+  return ir
+}
+
+function computeMonthly(brut: number, statut: Statut, parts: number): SalaryResult {
   const pmss = PMSS_MENSUEL
   const t1 = Math.min(brut, pmss)
   const t2 = Math.max(0, Math.min(brut - pmss, pmss * 7))
@@ -59,25 +92,50 @@ function computeMonthly(brut: number, statut: Statut): SalaryResult {
   add('CRDS', baseCsg, 0.005)
 
   const totalSalarial = lignes.reduce((s, l) => s + l.amount, 0)
+  const net = brut - totalSalarial
 
-  return { brut, net: brut - totalSalarial, totalSalarial, lignes }
+  // Net imposable = net + CSG non déductible + CRDS (non déductibles de l'IR)
+  const netImposable = net + baseCsg * 0.029
+
+  // PAS : annualiser pour calculer le taux, puis appliquer mensuellement
+  const netImposableAnnuel = netImposable * 12
+  const abattement = Math.max(495, Math.min(14_171, netImposableAnnuel * 0.10))
+  const revenuImposable = Math.max(0, netImposableAnnuel - abattement)
+  const irAnnuel = computeIR(revenuImposable, parts)
+  const tauxPas = netImposableAnnuel > 0 ? irAnnuel / netImposableAnnuel : 0
+  const pas = netImposable * tauxPas
+
+  return {
+    brut,
+    net,
+    netImposable,
+    totalSalarial,
+    lignes,
+    pas,
+    tauxPas,
+    netApresPas: net - pas,
+  }
 }
 
 function scale(r: SalaryResult, f: number): SalaryResult {
   return {
     brut: r.brut * f,
     net: r.net * f,
+    netImposable: r.netImposable * f,
     totalSalarial: r.totalSalarial * f,
     lignes: r.lignes.map(l => ({ ...l, base: l.base * f, amount: l.amount * f })),
+    pas: r.pas * f,
+    tauxPas: r.tauxPas,
+    netApresPas: r.netApresPas * f,
   }
 }
 
-function grossFromNet(netMensuel: number, statut: Statut): number {
+function grossFromNet(netMensuel: number, statut: Statut, parts: number): number {
   let lo = netMensuel
   let hi = netMensuel * 1.45
   for (let i = 0; i < 64; i++) {
     const mid = (lo + hi) / 2
-    if (computeMonthly(mid, statut).net < netMensuel) lo = mid
+    if (computeMonthly(mid, statut, parts).net < netMensuel) lo = mid
     else hi = mid
   }
   return (lo + hi) / 2
@@ -88,10 +146,11 @@ export function calculate(
   periode: Periode,
   direction: Direction,
   statut: Statut,
+  parts: number,
 ): SalaryResult {
   const mensuel = periode === 'annuel' ? value / 12 : value
   const brut =
-    direction === 'net-to-brut' ? grossFromNet(mensuel, statut) : mensuel
-  const result = computeMonthly(brut, statut)
+    direction === 'net-to-brut' ? grossFromNet(mensuel, statut, parts) : mensuel
+  const result = computeMonthly(brut, statut, parts)
   return periode === 'annuel' ? scale(result, 12) : result
 }
