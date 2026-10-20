@@ -45,8 +45,10 @@ jobs:
       - name: Build
         run: pnpm build
         env:
-          # Base path = /nom-du-repo/ pour GitHub Pages
-          VITE_BASE: /calcul-salaire-brute-net/
+          VITE_BASE: /
+
+      - name: Add CNAME
+        run: echo "salaire-net-brut.lecuistotduweb.fr" > dist/CNAME
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
