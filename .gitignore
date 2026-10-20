@@ -25,3 +25,7 @@ dist-ssr
 
 playwright-report
 test-results
+
+# Claude Code : settings.json est commité, le reste est local
+.claude/*
+!.claude/settings.json
