@@ -2,12 +2,12 @@ import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { ContributionTable } from '@/components/ContributionTable'
 import { fmt, fmtPct } from '@/lib/formatters'
-import type { SalaryResult, Direction, Periode } from '@/lib/salary-calculator'
+import type { SalaryResult } from '@/lib/salary-calculator'
+import type { SalaryDerived } from '@/hooks/useSalaryForm'
 
 interface ResultsPanelProps {
   result: SalaryResult | null
-  direction: Direction
-  periode: Periode
+  derived: SalaryDerived | null
   showDetail: boolean
   onToggleDetail: () => void
   tauxPasManuel: number | null
@@ -17,21 +17,20 @@ interface ResultsPanelProps {
 
 export function ResultsPanel({
   result,
-  direction,
-  periode,
+  derived,
   showDetail,
   onToggleDetail,
   tauxPasManuel,
   onTauxPasChange,
   onTauxPasReset,
 }: ResultsPanelProps) {
-  if (result == null) {
+  if (result == null || derived == null) {
     return (
       <div className="island-shell rounded-2xl overflow-hidden">
         <div className="flex flex-col items-center justify-center min-h-[340px] gap-3 text-center px-8">
-          <div className="w-14 h-14 rounded-2xl bg-[var(--bg-inner)] border border-[var(--line)] flex items-center justify-center mb-1">
+          <div className="w-14 h-14 rounded-2xl bg-sunken border border-line flex items-center justify-center mb-1">
             <svg
-              className="w-6 h-6 text-[var(--text-ghost)]"
+              className="w-6 h-6 text-ghost"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -44,7 +43,7 @@ export function ResultsPanel({
               />
             </svg>
           </div>
-          <p className="text-sm text-[var(--text-soft)] font-medium">
+          <p className="text-sm text-soft font-medium">
             Saisissez un salaire à gauche
             <br />
             pour voir vos résultats
@@ -54,28 +53,11 @@ export function ResultsPanel({
     )
   }
 
-  const outputValue = direction === 'brut-to-net' ? result.net : result.brut
-  const secondary = periode === 'mensuel' ? outputValue * 12 : outputValue / 12
-  const tauxTotal = result.totalSalarial / result.brut
-  const tauxPasEffectif = tauxPasManuel !== null ? tauxPasManuel / 100 : result.tauxPas
-  const netBase = periode === 'mensuel' ? result.net : result.net / 12
-  const netApresPasMensuel = netBase * (1 - tauxPasEffectif)
-  const netApresPasAnnuel = netBase * 12 * (1 - tauxPasEffectif)
-  const pasMensuel = netBase * tauxPasEffectif
-
-  const outputLabel =
-    direction === 'brut-to-net'
-      ? `Net social ${periode === 'mensuel' ? 'mensuel' : 'annuel'}`
-      : `Brut ${periode === 'mensuel' ? 'mensuel' : 'annuel'}`
-
   return (
     <div className="island-shell rounded-2xl overflow-hidden">
       <div className="p-5 space-y-4">
         {/* Main result */}
-        <div
-          className="relative overflow-hidden rounded-xl px-6 py-5 text-center"
-          style={{ background: 'linear-gradient(135deg, #253c59, #1a2d45)' }}
-        >
+        <div className="gradient-navy relative overflow-hidden rounded-xl px-6 py-5 text-center">
           <div
             className="pointer-events-none absolute inset-0"
             style={{
@@ -83,33 +65,28 @@ export function ResultsPanel({
                 'radial-gradient(ellipse at top right, rgba(255,255,255,0.12), transparent)',
             }}
           />
-          <p className="island-kicker relative" style={{ color: 'rgba(193,210,228,0.7)' }}>
-            {outputLabel}
-          </p>
+          <p className="island-kicker relative text-on-navy/70">{derived.outputLabel}</p>
           <p className="relative text-5xl font-black text-white tabular-nums tracking-tight mt-1">
-            {fmt(outputValue)}
+            {fmt(derived.outputValue)}
           </p>
-          <p className="relative text-sm mt-2" style={{ color: 'rgba(193,210,228,0.8)' }}>
-            soit <span className="font-bold text-white">{fmt(secondary)}</span> par{' '}
-            {periode === 'mensuel' ? 'an' : 'mois'}
+          <p className="relative text-sm mt-2 text-on-navy/80">
+            soit <span className="font-bold text-white">{fmt(derived.secondary)}</span> par{' '}
+            {derived.secondaryUnit}
           </p>
         </div>
 
         {/* Quick stats */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Brut', value: fmt(result.brut), className: 'text-[var(--text-base)]' },
+            { label: 'Brut', value: fmt(result.brut), className: 'text-foreground' },
             {
               label: 'Cotisations',
               value: `−${fmt(result.totalSalarial)}`,
-              className: 'text-[var(--brand)]',
+              className: 'text-brand',
             },
-            { label: 'Taux', value: fmtPct(tauxTotal), className: 'text-[var(--text-base)]' },
+            { label: 'Taux', value: fmtPct(derived.tauxTotal), className: 'text-foreground' },
           ].map(({ label, value, className }) => (
-            <div
-              key={label}
-              className="rounded-xl border border-[var(--line)] bg-[var(--bg-inner)] p-3 text-center"
-            >
+            <div key={label} className="rounded-xl border border-line bg-sunken p-3 text-center">
               <p className="island-kicker mb-1">{label}</p>
               <p className={cn('text-sm font-bold tabular-nums', className)}>{value}</p>
             </div>
@@ -120,7 +97,7 @@ export function ResultsPanel({
         <button
           type="button"
           onClick={onToggleDetail}
-          className="w-full flex items-center justify-center gap-1.5 text-xs text-[var(--text-soft)] hover:text-[var(--text-base)] transition-colors py-0.5 cursor-pointer"
+          className="w-full flex items-center justify-center gap-1.5 text-xs text-soft hover:text-foreground transition-colors py-0.5 cursor-pointer"
         >
           <svg
             className={cn(
@@ -141,19 +118,19 @@ export function ResultsPanel({
           <ContributionTable
             lignes={result.lignes}
             totalSalarial={result.totalSalarial}
-            tauxTotal={tauxTotal}
+            tauxTotal={derived.tauxTotal}
           />
         )}
 
-        <Separator className="bg-[var(--line)]" />
+        <Separator className="bg-line" />
 
         {/* PAS section */}
         <div className="space-y-3.5">
           <div className="flex items-center justify-between">
             <p className="island-kicker">Prélèvement à la source</p>
             {result.tauxPas > 0 && tauxPasManuel === null && (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--brand)] bg-[var(--bg-inner)] border border-[var(--line)] rounded-full px-2.5 py-0.5">
-                <span className="w-1 h-1 rounded-full bg-[var(--brand)]" />
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-brand bg-sunken border border-line rounded-full px-2.5 py-0.5">
+                <span className="w-1 h-1 rounded-full bg-brand" />
                 Estimé · {fmtPct(result.tauxPas)}
               </span>
             )}
@@ -172,13 +149,13 @@ export function ResultsPanel({
                   <button
                     type="button"
                     onClick={onTauxPasReset}
-                    className="text-[10px] font-bold text-[var(--brand)] hover:text-[var(--brand-hover)] transition-colors cursor-pointer"
+                    className="text-[10px] font-bold text-brand hover:text-brand-hover transition-colors cursor-pointer"
                   >
                     Réinitialiser
                   </button>
                 )}
-                <span className="text-sm font-bold text-[var(--text-base)] tabular-nums min-w-[52px] text-right">
-                  {fmtPct(tauxPasEffectif)}
+                <span className="text-sm font-bold text-foreground tabular-nums min-w-[52px] text-right">
+                  {fmtPct(derived.tauxPasEffectif)}
                 </span>
               </div>
             </div>
@@ -188,21 +165,19 @@ export function ResultsPanel({
               min={0}
               max={45}
               step={0.1}
-              value={tauxPasManuel !== null ? tauxPasManuel : result.tauxPas * 100}
+              value={derived.sliderValue}
               onChange={(e) => onTauxPasChange(parseFloat(e.target.value))}
-              className="w-full h-2 rounded-full appearance-none cursor-pointer bg-[var(--bg-inner)]"
+              aria-valuetext={fmtPct(derived.tauxPasEffectif)}
+              className="w-full h-2 rounded-full appearance-none cursor-pointer bg-sunken"
               style={{ accentColor: 'var(--brand)' }}
             />
-            <p className="text-[10px] text-[var(--text-ghost)] text-center mt-1">
+            <p className="text-[10px] text-ghost text-center mt-1">
               Ajustez selon votre avis d'impôt · 0 % – 45 %
             </p>
           </div>
 
           {/* Net après PAS */}
-          <div
-            className="relative overflow-hidden rounded-xl px-5 py-4"
-            style={{ background: 'linear-gradient(135deg, #f25353, #c94040)' }}
-          >
+          <div className="gradient-brand relative overflow-hidden rounded-xl px-5 py-4">
             <div
               className="pointer-events-none absolute inset-0"
               style={{
@@ -219,10 +194,12 @@ export function ResultsPanel({
                   Mensuel
                 </p>
                 <p className="text-2xl font-black text-white tabular-nums leading-tight">
-                  {fmt(netApresPasMensuel)}
+                  {fmt(derived.netApresPasMensuel)}
                 </p>
-                {pasMensuel > 0 && (
-                  <p className="text-[11px] mt-0.5 text-white/60">dont −{fmt(pasMensuel)} PAS</p>
+                {derived.pasMensuel > 0 && (
+                  <p className="text-[11px] mt-0.5 text-white/60">
+                    dont −{fmt(derived.pasMensuel)} PAS
+                  </p>
                 )}
               </div>
               <div className="text-center border-l border-white/20 pl-4">
@@ -230,7 +207,7 @@ export function ResultsPanel({
                   Annuel
                 </p>
                 <p className="text-2xl font-black text-white tabular-nums leading-tight">
-                  {fmt(netApresPasAnnuel)}
+                  {fmt(derived.netApresPasAnnuel)}
                 </p>
               </div>
             </div>

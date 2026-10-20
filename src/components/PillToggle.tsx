@@ -1,3 +1,4 @@
+import { useId, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface PillOption<T> {
@@ -18,29 +19,62 @@ export function PillToggle<T extends string | number>({
   value,
   onChange,
 }: PillToggleProps<T>) {
+  const legendId = useId()
+  const refs = useRef<(HTMLButtonElement | null)[]>([])
+
+  // Navigation clavier d'un radiogroup : flèches pour changer d'option.
+  function handleKeyDown(e: React.KeyboardEvent, index: number) {
+    const dir =
+      e.key === 'ArrowRight' || e.key === 'ArrowDown'
+        ? 1
+        : e.key === 'ArrowLeft' || e.key === 'ArrowUp'
+          ? -1
+          : 0
+    if (dir === 0) return
+    e.preventDefault()
+    const next = (index + dir + options.length) % options.length
+    onChange(options[next].value)
+    refs.current[next]?.focus()
+  }
+
   return (
     <fieldset className="border-0 p-0 m-0 min-w-0">
-      <legend className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5">
+      <legend
+        id={legendId}
+        className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5"
+      >
         {legend}
       </legend>
-      <div role="radiogroup" className="flex rounded-xl bg-muted p-1 gap-0.5">
-        {options.map((opt) => (
-          <button
-            key={String(opt.value)}
-            type="button"
-            role="radio"
-            aria-checked={value === opt.value}
-            onClick={() => onChange(opt.value)}
-            className={cn(
-              'flex-1 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition-all duration-150 cursor-pointer whitespace-nowrap',
-              value === opt.value
-                ? 'bg-[var(--bg-surface-strong)] text-[var(--text-base)] shadow-sm'
-                : 'text-[var(--text-soft)] hover:text-[var(--text-base)]',
-            )}
-          >
-            {opt.label}
-          </button>
-        ))}
+      <div
+        role="radiogroup"
+        aria-labelledby={legendId}
+        className="flex rounded-xl bg-muted p-1 gap-0.5"
+      >
+        {options.map((opt, i) => {
+          const selected = value === opt.value
+          return (
+            <button
+              key={String(opt.value)}
+              ref={(el) => {
+                refs.current[i] = el
+              }}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => onChange(opt.value)}
+              onKeyDown={(e) => handleKeyDown(e, i)}
+              className={cn(
+                'flex-1 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition-all duration-150 cursor-pointer whitespace-nowrap',
+                selected
+                  ? 'bg-surface text-foreground shadow-sm'
+                  : 'text-soft hover:text-foreground',
+              )}
+            >
+              {opt.label}
+            </button>
+          )
+        })}
       </div>
     </fieldset>
   )

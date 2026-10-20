@@ -144,6 +144,28 @@ describe('prélèvement à la source', () => {
   })
 })
 
+// ── Barème (taux des lignes) ──────────────────────────────────────────────────
+
+describe('barème des cotisations', () => {
+  it('la retraite complémentaire T1 est à 3,15 %', () => {
+    const ligne = brut(3000).lignes.find((l) => l.label === 'Retraite complémentaire (T1)')
+    expect(ligne?.rate).toBe(0.0315)
+  })
+
+  it('la CSG déductible est à 6,80 % sur base abattue', () => {
+    const ligne = brut(3000).lignes.find((l) => l.label === "CSG déductible de l'impôt")
+    expect(ligne?.rate).toBe(0.068)
+    expect(ligne?.base).toBeCloseTo(3000 * 0.9825, 5) // abattement frais pro
+  })
+
+  it('la CET (T1) à 0,14 % est présente pour un cadre, absente sinon', () => {
+    const cet = (statut: 'non-cadre' | 'cadre') =>
+      brut(3000, statut).lignes.find((l) => l.label === 'Contribution équilibre technique (T1)')
+    expect(cet('cadre')?.rate).toBe(0.0014)
+    expect(cet('non-cadre')).toBeUndefined()
+  })
+})
+
 // ── Cas limites ───────────────────────────────────────────────────────────────
 
 describe('cas limites', () => {
