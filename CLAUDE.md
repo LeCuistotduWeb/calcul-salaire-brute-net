@@ -53,6 +53,20 @@ src/
 - **Pre-commit** : scan secrets + lint + format check.
 - **Pre-push** : format check + lint + tests unitaires + tests E2E.
 
+## Workflow git
+
+**Toujours créer une branche avant de commencer** — jamais de commit direct sur `main`.
+
+Convention de nommage des branches :
+
+- `feat/<sujet>` — nouvelle fonctionnalité
+- `fix/<sujet>` — correction de bug
+- `chore/<sujet>` — tooling, config, refactoring sans impact utilisateur
+
+Le nom doit refléter ce que fait la branche (ex: `feat/cotisations-patronales`, `fix/pas-calcul-annuel`). Il peut être renommé si le scope évolue.
+
+Un hook `PreToolUse` bloque les `git commit` directs sur `main` / `master`.
+
 ## Ajouter une feature
 
 1. Si logique de calcul → ajouter dans `salary-calculator.ts` + tests unitaires.
