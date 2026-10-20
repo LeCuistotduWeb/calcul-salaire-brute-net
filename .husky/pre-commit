@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "▶ Scan secrets..."
-SECRETS=$(git diff --cached | grep -E '^\+' | grep -v '^\+\+\+' | grep -iE \
+SECRETS=$(git diff --cached | grep -E '^\+' | grep -vF '+++' | grep -iE \
   '(api[_-]?key[[:space:]]*[:=]|secret[_-]?key[[:space:]]*[:=]|access[_-]?token[[:space:]]*[:=]|auth[_-]?token[[:space:]]*[:=]|private[_-]?key[[:space:]]*[:=]|password[[:space:]]*[:=]|AKIA[A-Z0-9]+|sk-[a-zA-Z0-9]+|ghp_[a-zA-Z0-9]+)' \
   | grep -v 'aria-label\|key={' || true)
 if [ -n "$SECRETS" ]; then
