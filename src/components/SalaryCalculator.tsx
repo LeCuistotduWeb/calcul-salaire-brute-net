@@ -70,11 +70,6 @@ function PillToggle<T extends string | number>({
   )
 }
 
-/* ── Kicker pour les titres de section (non-formulaire) ── */
-function Kicker({ children }: { children: React.ReactNode }) {
-  return <p className="island-kicker mb-1.5">{children}</p>
-}
-
 const PARTS_OPTIONS: PillOption<number>[] = [
   { value: 1, label: '1' },
   { value: 1.5, label: '1,5' },
