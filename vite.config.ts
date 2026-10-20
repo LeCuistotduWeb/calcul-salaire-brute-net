@@ -4,6 +4,8 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [tailwindcss(), react()],
+  // En CI (GitHub Pages) la variable VITE_BASE est injectée par le workflow
+  base: process.env.VITE_BASE ?? '/',
   resolve: {
     alias: {
       '@': `${import.meta.dirname}/src`,
