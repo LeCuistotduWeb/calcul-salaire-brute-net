@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "▶ Format check..."
+pnpm format:check || { echo "✗ Format KO — lancez 'pnpm format' puis committez."; exit 1; }
+
+echo "▶ Lint..."
+pnpm lint || { echo "✗ Lint KO"; exit 1; }
+
+echo "▶ Tests unitaires..."
+pnpm test:unit || { echo "✗ Tests unitaires KO"; exit 1; }
+
+echo "▶ Tests E2E..."
+pnpm test:e2e || { echo "✗ Tests E2E KO"; exit 1; }
+
+echo "✓ Tout est vert — push autorisé."
