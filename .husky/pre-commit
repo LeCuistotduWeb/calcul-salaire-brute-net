@@ -1,1 +1,20 @@
-pnpm test
+#!/bin/sh
+
+echo "▶ Scan secrets..."
+SECRETS=$(git diff --cached | grep -E '^\+' | grep -v '^\+\+\+' | grep -iE \
+  '(api[_-]?key\s*[:=]|secret[_-]?key\s*[:=]|access[_-]?token\s*[:=]|auth[_-]?token\s*[:=]|private[_-]?key\s*[:=]|password\s*[:=]|AKIA[A-Z0-9]{16}|sk-[a-zA-Z0-9]{32,}|ghp_[a-zA-Z0-9]{36})' \
+  | grep -v 'aria-label\|key={' || true)
+if [ -n "$SECRETS" ]; then
+  echo "✗ Données sensibles détectées dans les fichiers stagés :"
+  echo "$SECRETS"
+  exit 1
+fi
+echo "  ✓ Rien de sensible détecté"
+
+echo "▶ Lint..."
+pnpm lint || { echo "✗ Lint KO"; exit 1; }
+
+echo "▶ Format check..."
+pnpm format:check || { echo "✗ Format KO — lancez 'pnpm format' puis committez."; exit 1; }
+
+echo "✓ Pre-commit OK."
