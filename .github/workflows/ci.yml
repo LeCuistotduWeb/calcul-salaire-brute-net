@@ -2,13 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+# Workflow : toujours passer par une feature branch + PR → main
+# Push direct sur main bloqué par la branch protection GitHub
 
 jobs:
   # ── Qualité : format · lint · build · tests unitaires ─────────────────────
