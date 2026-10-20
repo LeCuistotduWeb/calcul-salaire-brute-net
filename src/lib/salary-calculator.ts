@@ -151,3 +151,4 @@ export function calculate(
   const result = computeMonthly(brut, statut, parts)
   return periode === 'annuel' ? scale(result, 12) : result
 }
+// feature example
