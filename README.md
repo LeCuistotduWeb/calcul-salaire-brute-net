@@ -1,32 +1,46 @@
-# React + TypeScript + Vite
+# Simulateur salaire brut / net
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Outil de simulation des cotisations sociales françaises — barème 2025.  
+Calcul brut → net et net → brut, avec prélèvement à la source (PAS).
 
-Currently, two official plugins are available:
+**[→ Voir l'outil en ligne](https://salaire-net-brut.lecuistotduweb.fr)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Fonctionnalités
 
-## React Compiler
+- Conversion brut ↔ net (secteur privé, barème 2025)
+- Statut non-cadre / cadre (cotisations CET)
+- Calcul mensuel ou annuel
+- Prélèvement à la source estimé selon les parts fiscales (1 à 3)
+- Slider PAS ajustable selon l'avis d'imposition
+- Détail ligne par ligne des cotisations salariales
+- Mode sombre / clair persisté en localStorage
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the Oxlint configuration
+React 19 · TypeScript · Vite 8 · Tailwind CSS 4 · shadcn/ui
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Lancer en local
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+pnpm install
+pnpm dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Commandes
+
+```bash
+pnpm build          # Build production
+pnpm test:unit      # Tests unitaires (vitest)
+pnpm test:e2e       # Tests E2E (playwright)
+pnpm lint           # oxlint
+pnpm format         # prettier
+```
+
+## Contribuer
+
+Les PRs sont les bienvenues. Merci de passer par une feature branch et d'ouvrir une PR vers `main`.  
+Les hooks pre-commit vérifient lint + format. Le push exécute la suite complète (unit + E2E).
+
+## Licence
+
+[MIT](LICENSE) · Un outil de [LeCuistotduWeb](https://lecuistotduweb.fr)
