@@ -26,7 +26,7 @@ export interface SalaryResult {
 const BAREME_IR = [
   { max: 11_497, taux: 0 },
   { max: 29_315, taux: 0.11 },
-  { max: 83_823, taux: 0.30 },
+  { max: 83_823, taux: 0.3 },
   { max: 180_294, taux: 0.41 },
   { max: Infinity, taux: 0.45 },
 ] as const
@@ -58,14 +58,12 @@ function computeMonthly(brut: number, statut: Statut, parts: number): SalaryResu
 
   // Abattement 1,75 % pour frais pro sur fraction ≤ 4 PMSS
   const base4p = pmss * 4
-  const baseCsg =
-    brut <= base4p ? brut * 0.9825 : base4p * 0.9825 + (brut - base4p)
+  const baseCsg = brut <= base4p ? brut * 0.9825 : base4p * 0.9825 + (brut - base4p)
 
   const lignes: ContributionLine[] = []
 
   const add = (label: string, base: number, rate: number) => {
-    if (base > 0 && rate > 0)
-      lignes.push({ label, base, rate, amount: base * rate })
+    if (base > 0 && rate > 0) lignes.push({ label, base, rate, amount: base * rate })
   }
 
   // Retraite de base (Sécu)
@@ -99,7 +97,7 @@ function computeMonthly(brut: number, statut: Statut, parts: number): SalaryResu
 
   // PAS : annualiser pour calculer le taux, puis appliquer mensuellement
   const netImposableAnnuel = netImposable * 12
-  const abattement = Math.max(495, Math.min(14_171, netImposableAnnuel * 0.10))
+  const abattement = Math.max(495, Math.min(14_171, netImposableAnnuel * 0.1))
   const revenuImposable = Math.max(0, netImposableAnnuel - abattement)
   const irAnnuel = computeIR(revenuImposable, parts)
   const tauxPas = netImposableAnnuel > 0 ? irAnnuel / netImposableAnnuel : 0
@@ -123,7 +121,7 @@ function scale(r: SalaryResult, f: number): SalaryResult {
     net: r.net * f,
     netImposable: r.netImposable * f,
     totalSalarial: r.totalSalarial * f,
-    lignes: r.lignes.map(l => ({ ...l, base: l.base * f, amount: l.amount * f })),
+    lignes: r.lignes.map((l) => ({ ...l, base: l.base * f, amount: l.amount * f })),
     pas: r.pas * f,
     tauxPas: r.tauxPas,
     netApresPas: r.netApresPas * f,
@@ -149,8 +147,7 @@ export function calculate(
   parts: number,
 ): SalaryResult {
   const mensuel = periode === 'annuel' ? value / 12 : value
-  const brut =
-    direction === 'net-to-brut' ? grossFromNet(mensuel, statut, parts) : mensuel
+  const brut = direction === 'net-to-brut' ? grossFromNet(mensuel, statut, parts) : mensuel
   const result = computeMonthly(brut, statut, parts)
   return periode === 'annuel' ? scale(result, 12) : result
 }

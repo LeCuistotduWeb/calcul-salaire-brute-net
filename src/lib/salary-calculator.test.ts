@@ -6,8 +6,7 @@ import { calculate, PMSS_MENSUEL } from './salary-calculator'
 const brut = (value: number, statut: 'non-cadre' | 'cadre' = 'non-cadre') =>
   calculate(value, 'mensuel', 'brut-to-net', statut, 1)
 
-const annual = (value: number) =>
-  calculate(value, 'annuel', 'brut-to-net', 'non-cadre', 1)
+const annual = (value: number) => calculate(value, 'annuel', 'brut-to-net', 'non-cadre', 1)
 
 const netToGross = (net: number, statut: 'non-cadre' | 'cadre' = 'non-cadre') =>
   calculate(net, 'mensuel', 'net-to-brut', statut, 1)
@@ -51,15 +50,15 @@ describe('brut → net (mensuel)', () => {
 
   it("au-dessus du PMSS, la T2 AGIRC-ARRCO s'applique", () => {
     const r = brut(PMSS_MENSUEL + 1000)
-    const t2Lines = r.lignes.filter(l => l.label.includes('T2'))
+    const t2Lines = r.lignes.filter((l) => l.label.includes('T2'))
     expect(t2Lines.length).toBeGreaterThan(0)
   })
 
   it('le taux de cotisations est entre 20 % et 30 % pour un salaire standard', () => {
     const r = brut(3000)
     const taux = r.totalSalarial / r.brut
-    expect(taux).toBeGreaterThan(0.20)
-    expect(taux).toBeLessThan(0.30)
+    expect(taux).toBeGreaterThan(0.2)
+    expect(taux).toBeLessThan(0.3)
   })
 })
 
@@ -155,9 +154,9 @@ describe('cas limites', () => {
 
   it('très haut salaire (20 000 €) → T2 présente, taux < 30 %', () => {
     const r = brut(20000)
-    const t2 = r.lignes.find(l => l.label.includes('T2'))
+    const t2 = r.lignes.find((l) => l.label.includes('T2'))
     expect(t2).toBeDefined()
     const taux = r.totalSalarial / r.brut
-    expect(taux).toBeLessThan(0.30)
+    expect(taux).toBeLessThan(0.3)
   })
 })

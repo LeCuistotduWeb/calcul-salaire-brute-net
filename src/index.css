@@ -1,16 +1,16 @@
-@import "@fontsource-variable/manrope";
-@import "@fontsource-variable/fraunces/opsz.css";
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import '@fontsource-variable/manrope';
+@import '@fontsource-variable/fraunces/opsz.css';
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
 /* ── Variables : calquées sur lecuistotduweb.fr ── */
 :root {
-  --hero-a: rgba(242, 83, 83, 0.10);
+  --hero-a: rgba(242, 83, 83, 0.1);
   --hero-b: rgba(37, 60, 89, 0.06);
-  --hero-c: rgba(228, 185, 98, 0.10);
+  --hero-c: rgba(228, 185, 98, 0.1);
   --bg-base: #f7ebd3;
   --bg-foam: #faf5ec;
   --bg-inner: #f5efe0;
@@ -51,7 +51,7 @@
 }
 
 .dark {
-  --hero-a: rgba(242, 83, 83, 0.10);
+  --hero-a: rgba(242, 83, 83, 0.1);
   --hero-b: rgba(60, 100, 160, 0.15);
   --hero-c: rgba(60, 100, 160, 0.08);
   --bg-base: #111827;
@@ -92,8 +92,8 @@
 }
 
 @theme inline {
-  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces Variable", Georgia, serif;
+  --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -121,7 +121,9 @@
   --color-navy-deep: var(--navy-deep);
 }
 
-html, body, #root {
+html,
+body,
+#root {
   min-height: 100%;
 }
 
@@ -134,7 +136,12 @@ body {
     radial-gradient(1100px 620px at -8% -10%, var(--hero-a), transparent 58%),
     radial-gradient(1050px 620px at 112% -12%, var(--hero-b), transparent 62%),
     radial-gradient(720px 380px at 50% 115%, var(--hero-c), transparent 68%),
-    linear-gradient(180deg, color-mix(in oklab, var(--bg-base) 68%, white) 0%, var(--bg-foam) 44%, var(--bg-base) 100%);
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--bg-base) 68%, white) 0%,
+      var(--bg-foam) 44%,
+      var(--bg-base) 100%
+    );
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -150,7 +157,7 @@ body {
 
 /* Grille de fond */
 body::after {
-  content: "";
+  content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -169,7 +176,7 @@ body::after {
   background: linear-gradient(165deg, var(--bg-surface-strong), var(--bg-surface));
   box-shadow:
     0 1px 0 var(--inset-glint) inset,
-    0 22px 44px rgba(37, 60, 89, 0.10),
+    0 22px 44px rgba(37, 60, 89, 0.1),
     0 6px 18px rgba(37, 60, 89, 0.08);
   backdrop-filter: blur(4px);
 }
@@ -177,8 +184,8 @@ body::after {
 .dark .island-shell {
   box-shadow:
     0 1px 0 var(--inset-glint) inset,
-    0 22px 44px rgba(0, 0, 0, 0.30),
-    0 6px 18px rgba(0, 0, 0, 0.20);
+    0 22px 44px rgba(0, 0, 0, 0.3),
+    0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .island-kicker {

@@ -41,9 +41,7 @@ test.describe('Calculateur salaire brut/net', () => {
     await expect(page.locator('text=Net social annuel').first()).toBeVisible()
   })
 
-  test('bascule non-cadre → cadre réduit le net (cotisations CET)', async ({
-    page,
-  }) => {
+  test('bascule non-cadre → cadre réduit le net (cotisations CET)', async ({ page }) => {
     await page.locator('#salary-input').fill('4000')
 
     const getValue = async () => {
@@ -67,16 +65,12 @@ test.describe('Calculateur salaire brut/net', () => {
 
   test('le bloc PAS est visible avec un salaire saisi', async ({ page }) => {
     // Utilise exact:true pour éviter l'ambiguïté avec le sous-titre
-    await expect(
-      page.locator('text=Prélèvement à la source').nth(1),
-    ).toBeVisible()
+    await expect(page.locator('text=Prélèvement à la source').nth(1)).toBeVisible()
     await expect(page.locator('text=Net après impôt')).toBeVisible()
     await expect(page.locator('#pas-slider')).toBeVisible()
   })
 
-  test('bouton réinitialiser apparaît après avoir bougé le slider PAS', async ({
-    page,
-  }) => {
+  test('bouton réinitialiser apparaît après avoir bougé le slider PAS', async ({ page }) => {
     await page.locator('#pas-slider').fill('10')
     await expect(page.locator('text=Réinitialiser')).toBeVisible()
   })
@@ -87,7 +81,7 @@ test.describe('Calculateur salaire brut/net', () => {
     await expect(page.locator('text=Réinitialiser')).not.toBeVisible()
   })
 
-  test('changer les parts fiscales modifie le taux PAS ou l\'efface si non imposable', async ({
+  test("changer les parts fiscales modifie le taux PAS ou l'efface si non imposable", async ({
     page,
   }) => {
     // À 1 part et 3 000 € brut, le badge "Estimé" est visible
@@ -117,9 +111,7 @@ test.describe('Calculateur salaire brut/net', () => {
   test('le toggle dark/light ajoute la classe .dark sur <html>', async ({ page }) => {
     const toggleBtn = page.getByRole('button', { name: /mode sombre|mode clair/i })
     await toggleBtn.click()
-    const hasDark = await page.evaluate(() =>
-      document.documentElement.classList.contains('dark'),
-    )
+    const hasDark = await page.evaluate(() => document.documentElement.classList.contains('dark'))
     expect(hasDark).toBe(true)
   })
 
