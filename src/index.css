@@ -25,8 +25,10 @@
   --text-ghost: #7a95ad;
   --brand: #f25353;
   --brand-hover: #e85f5f;
+  --brand-deep: #c94040;
   --navy: #253c59;
   --navy-deep: #1a2d45;
+  --on-navy: #c1d2e4; /* texte posé sur les surfaces navy (constant clair/sombre) */
 
   /* shadcn tokens */
   --background: #f7ebd3;
@@ -35,7 +37,7 @@
   --card-foreground: #253c59;
   --popover: #faf5ec;
   --popover-foreground: #253c59;
-  --primary: #f25353;
+  --primary: var(--brand); /* le primaire shadcn reflète la couleur de marque */
   --primary-foreground: #ffffff;
   --secondary: #f5efe0;
   --secondary-foreground: #253c59;
@@ -68,8 +70,10 @@
   --text-ghost: #93a8be;
   --brand: #f25353;
   --brand-hover: #e85f5f;
+  --brand-deep: #c94040;
   --navy: #253c59;
   --navy-deep: #0f1c28;
+  --on-navy: #c1d2e4;
 
   --background: #121e2a;
   --foreground: #ffffff;
@@ -77,7 +81,7 @@
   --card-foreground: #ffffff;
   --popover: #172231;
   --popover-foreground: #ffffff;
-  --primary: #f25353;
+  --primary: var(--brand);
   --primary-foreground: #ffffff;
   --secondary: #253c59;
   --secondary-foreground: #ffffff;
@@ -116,9 +120,20 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Tokens de marque / surfaces exposés comme utilitaires (bg-*, text-*, border-*) */
   --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-deep: var(--brand-deep);
   --color-navy: var(--navy);
   --color-navy-deep: var(--navy-deep);
+  --color-on-navy: var(--on-navy);
+  --color-soft: var(--text-soft);
+  --color-subtle: var(--text-subtle);
+  --color-ghost: var(--text-ghost);
+  --color-line: var(--line);
+  --color-surface: var(--bg-surface-strong);
+  --color-sunken: var(--bg-inner);
 }
 
 html,
@@ -186,6 +201,15 @@ body::after {
     0 1px 0 var(--inset-glint) inset,
     0 22px 44px rgba(0, 0, 0, 0.3),
     0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+/* Surfaces en dégradé — pilotées par tokens, plus aucun hex dans le JSX */
+.gradient-navy {
+  background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+}
+
+.gradient-brand {
+  background: linear-gradient(135deg, var(--brand), var(--brand-deep));
 }
 
 .island-kicker {

@@ -78,28 +78,27 @@ export function ParamsPanel({
       <div>
         <label
           htmlFor="salary-input"
-          className="block text-sm font-semibold text-[var(--text-base)] mb-1.5"
+          className="block text-sm font-semibold text-foreground mb-1.5"
         >
           {inputLabel}
         </label>
         <div className="relative">
           <Input
             id="salary-input"
-            type="number"
-            min={0}
-            step={100}
+            type="text"
+            inputMode="decimal"
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
-            className="text-xl font-bold pr-10 h-12 rounded-xl bg-[var(--bg-surface-strong)] border-[var(--line)] focus-visible:ring-[var(--brand)]/30 focus-visible:border-[var(--brand)]"
+            className="text-xl font-bold pr-10 h-12 rounded-xl bg-surface border-line focus-visible:ring-brand/30 focus-visible:border-brand"
             placeholder="3 000"
           />
-          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-ghost)] font-semibold pointer-events-none select-none text-lg">
+          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ghost font-semibold pointer-events-none select-none text-lg">
             €
           </span>
         </div>
       </div>
 
-      <Separator className="bg-[var(--line)]" />
+      <Separator className="bg-line" />
 
       <PillToggle
         legend="Parts fiscales (PAS)"
@@ -108,10 +107,9 @@ export function ParamsPanel({
         onChange={onPartsChange}
       />
 
-      <div className="rounded-xl bg-[var(--bg-inner)] border border-[var(--line)] px-3.5 py-3 text-xs text-[var(--text-soft)] leading-relaxed">
-        PMSS mensuel 2025 :{' '}
-        <span className="font-bold text-[var(--text-base)]">{fmt(PMSS_MENSUEL)}</span> · Hors
-        conventions collectives · Barème IR 2025
+      <div className="rounded-xl bg-sunken border border-line px-3.5 py-3 text-xs text-soft leading-relaxed">
+        PMSS mensuel 2025 : <span className="font-bold text-foreground">{fmt(PMSS_MENSUEL)}</span> ·
+        Hors conventions collectives · Barème IR 2025
       </div>
     </div>
   )

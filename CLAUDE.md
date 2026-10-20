@@ -44,7 +44,8 @@ src/
 - Les composants sont display-only : ils reçoivent des props, émettent des callbacks.
 - `SalaryCalculator` est l'orchestrateur : il instancie les hooks et câble les composants.
 - Formatage monétaire : toujours `fmt()`. Pourcentages : toujours `fmtPct()`.
-- Les constantes fiscales (PMSS, barèmes IR) vivent dans `salary-calculator.ts`.
+- Les constantes fiscales vivent dans l'objet `BAREME` de `salary-calculator.ts` (un objet par année, aucun magic number dans les fonctions de calcul).
+- **Design tokens** : les couleurs/surfaces sont des variables CSS définies dans `index.css` (`:root` + `.dark`) et exposées en utilitaires Tailwind via `@theme`. Dans le JSX, utiliser les classes sémantiques (`text-foreground`, `bg-sunken`, `border-line`, `text-brand`, `gradient-navy`…) — **jamais** d'arbitrary values `[var(--…)]` ni de hex en dur.
 
 ## Tests
 
